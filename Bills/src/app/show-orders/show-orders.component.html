@@ -1,0 +1,122 @@
+<app-navbar></app-navbar>
+<div class="container mt-5">
+<div class="row mt-2">
+    <div class="col-8 border-bottom pb-2 mb-3">
+        <h1 class="display-3">Show Orders</h1>
+    </div>
+</div>
+
+<!-- show Order Form -->
+<form [formGroup]="showOrderForm" (ngSubmit)="submitShow()">
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <label for="custom">Customer</label>
+            <div class="form-group">
+                <input type="text" class="form-control" id="custom" formControlName="customer" [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete">
+                    <mat-option *ngFor="let cust of filteredOptions|async" [value]="cust">
+                        {{ cust }}
+                    </mat-option>
+                </mat-autocomplete>
+                <p *ngIf="showOrderForm.controls['customer'].touched && showOrderForm.controls['customer'].invalid" class="error"><sup>*</sup>Customer shouldn't Empty</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-4 pl-2 ml-2 mb-3 row">
+            <mat-form-field>
+                <mat-label>Start Date</mat-label>
+                <input matInput autocomplete="off" (ngModelChange)="onDateChange()" [matDatepicker]="myDatepicker" (click)="myDatepicker.open()" formControlName="startDate" required>
+                <mat-datepicker-toggle matSuffix [for]="myDatepicker"></mat-datepicker-toggle>
+                <mat-datepicker #myDatepicker></mat-datepicker>
+            </mat-form-field>
+            <p *ngIf="showOrderForm.controls['startDate'].invalid" class="error"><sup>*</sup>Please enter Start Date</p>
+        </div>
+
+        <div class="col-lg-4 mb-3 row">
+            <mat-form-field>
+                <mat-label>End Date</mat-label>
+                <input matInput autocomplete="off" 
+                    [min]="showOrderForm.controls['startDate'].value" 
+                    [max]="maxDate"
+                    (click)="myDate.open()" 
+                    [matDatepicker]="myDate" 
+                    formControlName="endDate" required>
+                <mat-datepicker-toggle matSuffix [for]="myDate"></mat-datepicker-toggle>
+                <mat-datepicker #myDate></mat-datepicker>
+            </mat-form-field>
+            <p *ngIf="showOrderForm.controls['endDate'].invalid" class="error"><sup>*</sup>Please enter date within 7 days of start date</p>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="form-group text-right col-lg-8">
+            <button type="button" class="btn btn-secondary mr-2 gap-right" (click)="ResetForm()">Reset</button>
+            <button type="submit" class="btn btn-success" [disabled]="!showOrderForm.valid">Show Orders</button>
+        </div>
+    </div>
+</form>
+
+<div class="row">
+    <div class="col-12" *ngFor="let orders of orderColl">
+        <div class="row mt-3" *ngIf = "!orders.data.length">
+            <div class="col-lg-12 py-2 my-auto bg-dark text-white text-center rounded">
+                {{'There is no order for date: '+orders.dat}}
+            </div>
+        </div>
+        <div class="row mt-5" *ngIf="orders.data.length">
+        <div class="col-6">
+        <h2 class="font-italic">Bill Dated: {{orders.dat}}</h2>
+        </div>
+        <div class="col-6 text-right">
+        <app-invoice [ord]=orders></app-invoice>
+        </div>
+        </div>
+        <table class="table table-sm" *ngIf="orders.data.length">
+
+            <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Rate</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+
+            <tr *ngFor="let ord of orders.data;index as i">
+                <td>{{i+1}}</td>
+                <td>{{ord.name}}</td>
+                <td>{{ord.quantity}}</td>
+                <td>{{ord.rate}}</td>
+                <td>{{ord.quantity * ord.rate}}</td>
+            </tr>
+
+            <tr>
+                <th colspan="4" class="table-warning">Total:</th>
+                <td class="table-warning">{{orders.priceSum | currency:"₹"}}</td>
+            </tr>
+            <tr>
+                <th colspan="4" class="table-warning">CGST @ 9%:</th>
+                <td class="table-warning">{{orders.priceSum*0.09 | currency:"₹"}}</td>
+            </tr>
+            <tr>
+                <th colspan="4" class="table-warning">SGST @ 9%:</th>
+                <td class="table-warning">{{orders.priceSum*0.09 | currency:"₹"}}</td>
+            </tr>
+
+            <tfoot>
+                <tr>
+                    <th colspan="4" class="table-info">Total Amount:</th>
+                    <td class="table-info">{{orders.priceSum*1.18 | currency:"₹"}}</td>
+                </tr>
+            </tfoot>
+
+        </table>
+    </div>
+</div>
+</div>

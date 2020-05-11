@@ -1,0 +1,54 @@
+<div class="pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="display-3">Create Order</h1>
+</div>
+
+<!-- Order Form -->
+<form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="form-group">
+                <label for="custom">Customer</label>
+                <input type="text" class="form-control" id="custom" formControlName="customer" [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete">
+                    <mat-option *ngFor="let cust of filteredOptions|async" [value]="cust">
+                    {{ cust }}
+                    </mat-option>
+                </mat-autocomplete>
+                <p *ngIf="orderForm.controls['customer'].touched && orderForm.controls['customer'].invalid" class="error"><sup>*</sup>Customer should not be Empty</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-6 mb-3">
+            <label for="name">Item Name</label>
+            <input type="text" id="name" formControlName="name" class="form-control" required>
+            <p *ngIf="orderForm.controls['name'].touched && orderForm.controls['name'].invalid" class="error"><sup>*</sup>Please enter atleast first name</p>
+            <p *ngIf="orderForm.controls['name'].errors?.minlength" class="error"><sup>*</sup>Name shouldn't be less than 2 words</p>
+        </div>
+        <div class="col-lg-3 mb-3">
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" formControlName="quantity" class="form-control" required>
+            <p *ngIf="orderForm.controls['quantity'].touched && orderForm.controls['quantity'].invalid" class="error"><sup>*</sup>Please enter at least some Quantity</p>
+        </div>
+        <div class="col-lg-3 mb-3">
+            <label for="rate">Rate</label>
+            <input type="number" id="rate" formControlName="rate" class="form-control" required>
+            <p *ngIf="orderForm.controls['rate'].touched && orderForm.controls['rate'].invalid" class="error"><sup>*</sup>Please enter atleast some Rate</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="form-group text-right">
+                <button type="button" class="btn btn-secondary mr-2 gap-right" (click)="ResetForm()">Reset</button>
+                <button type="submit" class="btn btn-success" [disabled]="!orderForm.valid">Add Item</button>
+            </div>
+        </div>
+    </div>
+    
+</form>
+
+<app-order-summary></app-order-summary>
